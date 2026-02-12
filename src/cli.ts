@@ -72,7 +72,7 @@ const availableFeatures: Feature[] = [
     name: 'Git',
     description: 'Initializes the new project as a git repository',
     directory: path.join(TEMPLATES_DIR, 'git'),
-    hook: (params) => execInProjectDir(`git init`, params),
+    hook: (params) => execInProjectDir(`git init && git add . && git commit -m "Initial commit"`, params),
   },
 ]
 
