@@ -37,7 +37,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  plugins: [cssInjectedByJsPlugin({ topExecutionPriority: false }), banner({ content: meta, verify: false })],
+  plugins: [cssInjectedByJsPlugin({ topExecutionPriority: true }), banner({ content: meta, verify: false })],
   build: {
     cssCodeSplit: false,
     lib: {
