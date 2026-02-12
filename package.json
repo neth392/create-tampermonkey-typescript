@@ -10,6 +10,10 @@
     "typescript",
     "template"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "bin": {
     "create-tampermonkey-typescript": "dist/cli.js"

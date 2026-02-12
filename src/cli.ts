@@ -11,7 +11,8 @@ import { fileURLToPath } from 'url'
 
 type Params = Awaited<ReturnType<typeof promptForParams>> & {
   projectPath: string
-  selectedFeatures: Feature[]
+  features: Feature[]
+  packageManager: PackageManager
 }
 
 type Feature = {
@@ -22,6 +23,13 @@ type Feature = {
   devDependencies?: string[]
   dependencies?: string[]
   hook?: (params: Params) => void
+}
+
+type PackageManager = {
+  name: string
+  exists: () => boolean
+  installCmd: string
+  addDependencyCmd: string
 }
 
 const __FILENAME = fileURLToPath(import.meta.url)
@@ -76,18 +84,41 @@ const availableFeatures: Feature[] = [
   },
 ]
 
+const availablePackageManagers: PackageManager[] = [
+  {
+    name: 'npm',
+    exists: () => commandExists('npm --version'),
+    installCmd: 'npm install',
+    addDependencyCmd: 'npm install',
+  },
+  {
+    name: 'yarn',
+    exists: () => commandExists('yarn --version'),
+    installCmd: 'yarn install',
+    addDependencyCmd: 'yarn add',
+  },
+  {
+    name: 'pnpm',
+    exists: () => commandExists('pnpm --version'),
+    installCmd: 'pnpm install',
+    addDependencyCmd: 'pnpm add',
+  },
+]
+
 async function main() {
   console.log(kleur.green('create-tampermonkey-typescript'))
   if (!checkCwdAccess()) return
+  if (!findValidPackageManager()) return
 
   // Prompt for project parameters
   const promptResults = await promptForParams()
   const params: Params = {
     ...promptResults,
     projectPath: path.join(process.cwd(), promptResults.projectName),
-    selectedFeatures: promptResults.features.map((featureName: string) =>
+    features: promptResults.featureNames.map((featureName: string) =>
       availableFeatures.find((a) => a.name === featureName)
     ),
+    packageManager: availablePackageManagers.find((pm) => pm.name === promptResults.packageManagerName)!,
   }
 
   // Create the directory
@@ -105,27 +136,31 @@ async function main() {
   const packageJson = createPackageJson(params)
   writeObjectToFile(packageJson, 'package.json', params)
 
+  // Initialize the lock file
+  logWithPrefix(`Initializing lock file`)
+  execInProjectDir(`${params.packageManager.installCmd}`, params)
+
   // Gather dependencies
-  const devDeps = [...defaultDevDeps, ...params.selectedFeatures.flatMap((f) => f.devDependencies ?? [])]
-  const deps = [...defaultDeps, ...params.selectedFeatures.flatMap((f) => f.dependencies ?? [])]
+  const devDeps = [...defaultDevDeps, ...params.features.flatMap((f) => f.devDependencies ?? [])]
+  const deps = [...defaultDeps, ...params.features.flatMap((f) => f.dependencies ?? [])]
 
   // Install dev dependencies
   if (devDeps.length > 0) {
     logWithPrefix('Installing dev dependencies')
     console.log(`    ${kleur.dim(devDeps.join(', '))}`)
-    execInProjectDir(`npm install -D ${devDeps.join(' ')}`, params)
+    execInProjectDir(`${params.packageManager.addDependencyCmd} -D ${devDeps.join(' ')}`, params)
   }
 
   // Install dependencies
   if (deps.length > 0) {
     logWithPrefix('Installing dependencies')
     console.log(`    ${kleur.dim(deps.join(', '))}`)
-    execInProjectDir(`npm install ${deps.join(' ')}`, params)
+    execInProjectDir(`${params.packageManager.addDependencyCmd}  ${deps.join(' ')}`, params)
   }
 
   // Handle tsconfig.json
   const tsConfig = { ...baseTsConfig }
-  for (const feature of params.selectedFeatures) {
+  for (const feature of params.features) {
     if (feature.tsConfigModifier) {
       feature.tsConfigModifier(tsConfig)
     }
@@ -138,24 +173,48 @@ async function main() {
   // Base files
   fs.cpSync(path.join(TEMPLATES_DIR, 'base'), params.projectPath, { recursive: true, force: true })
   // Feature files
-  params.selectedFeatures
+  params.features
     .filter((f) => f.directory)
     .forEach((f) => fs.cpSync(f.directory!, params.projectPath, { recursive: true, force: true }))
 
   // Handle feature runAfter's
-  logWithPrefix('Running feature hooks')
-  params.selectedFeatures.forEach((f) => f.hook?.(params))
+  params.features
+    .filter((f) => f.hook)
+    .forEach((f) => {
+      logWithPrefix(`Running feature hook: ${kleur.yellow(f.name)}`)
+      f.hook!(params)
+    })
+
+  console.log(`${kleur.green('Done!')} Project created at ${kleur.yellow(params.projectPath)}`)
 }
 
 function logWithPrefix(message: string) {
   console.log(`${kleur.cyan('-')} ${kleur.white(message)}`)
 }
 
+function commandExists(cmd: string): boolean {
+  try {
+    execSync(cmd, { stdio: 'ignore' })
+    return true
+  } catch {
+    return false
+  }
+}
+
 function checkCwdAccess() {
   try {
     fs.accessSync(process.cwd(), fs.constants.W_OK | fs.constants.R_OK)
   } catch {
-    console.log('Read & write access to current working directory is required.')
+    console.log(kleur.red('Read & write access to current working directory is required.'))
+    return false
+  }
+  return true
+}
+
+function findValidPackageManager() {
+  if (!availablePackageManagers.find((pm) => pm.exists())) {
+    console.log(kleur.red('Could not find any valid package manager: '))
+    console.log(kleur.yellow(`(${availablePackageManagers.map((pm) => pm.name).join(', ')})`))
     return false
   }
   return true
@@ -204,8 +263,14 @@ async function promptForParams() {
         message: 'Author:',
       },
       {
+        type: 'select',
+        name: 'packageManagerName',
+        message: 'Package manager:',
+        choices: availablePackageManagers.filter((pm) => pm.exists()).map((pm) => ({ title: pm.name, value: pm.name })),
+      },
+      {
         type: 'multiselect',
-        name: 'features',
+        name: 'featureNames',
         message: 'Select features:',
         choices: availableFeatures.map((f) => ({ title: f.name, value: f.name, description: f.description })),
       },
@@ -253,6 +318,6 @@ function execInProjectDir(command: string, params: Params) {
 }
 
 main().then(
-  () => console.log(kleur.green('Done!')),
+  () => {},
   (e) => console.error(kleur.red(e.message || e))
 )
