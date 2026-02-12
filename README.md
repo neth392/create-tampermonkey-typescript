@@ -11,7 +11,7 @@ file ready to install in TamperMonkey.
 ## Features
 
 📦 **TypeScript with multi-file support** — Structure your project however you like. All source files are bundled into 
-a single IIFE-format JavaScript file via [Vite](https://vitejs.dev/), fully compatible with TamperMonkey.
+a single IIFE-format JavaScript file via [Vite](https://vite.dev/), fully compatible with TamperMonkey.
 
 🏷️ **Automatic userscript header** — The `// ==UserScript==` block is generated from a template (`userscript.txt`) and
 prepended to every build. Metadata fields such as name, version, and description are pulled directly from `package.json`, 
