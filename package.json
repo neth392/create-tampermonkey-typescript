@@ -1,6 +1,6 @@
 {
   "name": "create-tampermonkey-typescript",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "CLI tool for generating a TamperMonkey script project written in typescript which is transpiled to JavaScript to be ran in the browser",
   "license": "MIT",
   "homepage": "https://github.com/neth392/create-tampermonkey-typescript",
@@ -14,6 +14,10 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "files": [
+    "dist",
+    "templates"
+  ],
   "type": "module",
   "bin": {
     "create-tampermonkey-typescript": "dist/cli.js"
