@@ -1,0 +1,41 @@
+{
+  "name": "create-tampermonkey-typescript",
+  "version": "1.0.0",
+  "description": "CLI tool for generating a TamperMonkey script project written in typescript which is transpiled to JavaScript to be ran in the browser",
+  "license": "MIT",
+  "homepage": "https://github.com/neth392/create-tampermonkey-typescript",
+  "author": "neth392",
+  "keywords": [
+    "tampermonkey",
+    "typescript",
+    "template"
+  ],
+  "type": "module",
+  "bin": {
+    "create-tampermonkey-typescript": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "@types/prompts": "^2.4.9",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@types/tampermonkey": "^5.0.4",
+    "prettier": "^3.6.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "ts-node": "^10.9.2",
+    "type-fest": "^5.4.4",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.0",
+    "vite-plugin-banner": "^0.8.1",
+    "vite-plugin-css-injected-by-js": "^3.5.2"
+  },
+  "dependencies": {
+    "kleur": "^4.1.5",
+    "prompts": "^2.4.2"
+  }
+}

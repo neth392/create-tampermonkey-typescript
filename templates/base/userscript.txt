@@ -1,0 +1,7 @@
+// ==UserScript==
+// @name           <name>
+// @version        <version>
+// @description    <description>
+// @author         <author>
+// @homepage       <homepage>
+// ==/UserScript==

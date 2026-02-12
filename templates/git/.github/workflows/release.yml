@@ -1,0 +1,56 @@
+name: Build & Release Tampermonkey Script
+
+permissions:
+  contents: write
+
+on:
+  workflow_run:
+    workflows: ["Auto Tag from package.json"]
+    types:
+      - completed
+
+jobs:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          check-latest: true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build script
+        run: npm run build
+
+      - name: Get package name
+        id: pkg
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          echo "PACKAGE_NAME=$NAME" >> $GITHUB_ENV
+
+      - name: Get latest tag from Git
+        id: tag
+        run: |
+          git fetch --tags
+          TAG=$(git describe --tags --abbrev=0)
+          echo "TAG_NAME=$TAG" >> $GITHUB_ENV
+          echo "Latest tag: $TAG"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}  ${{ env.TAG_NAME }}
+          tag_name: ${{ env.TAG_NAME }}
+          files: dist/script.user.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
