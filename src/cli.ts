@@ -82,6 +82,12 @@ const availableFeatures: Feature[] = [
     directory: path.join(TEMPLATES_DIR, 'git'),
     hook: (params) => execInProjectDir(`git init && git add . && git commit -m "Initial commit"`, params),
   },
+  {
+    name: 'Github Workflows',
+    description:
+      'Includes 2 workflows; one for tagging releases with current version, and another for building & creating a release',
+    directory: path.join(TEMPLATES_DIR, 'github-workflows'),
+  },
 ]
 
 const availablePackageManagers: PackageManager[] = [
