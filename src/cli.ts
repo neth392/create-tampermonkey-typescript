@@ -30,6 +30,7 @@ type PackageManager = {
   exists: () => boolean
   installCmd: string
   addDependencyCmd: string
+  runCmd: string
 }
 
 const __FILENAME = fileURLToPath(import.meta.url)
@@ -96,18 +97,21 @@ const availablePackageManagers: PackageManager[] = [
     exists: () => commandExists('npm --version'),
     installCmd: 'npm install',
     addDependencyCmd: 'npm install',
+    runCmd: 'npm run',
   },
   {
     name: 'yarn',
     exists: () => commandExists('yarn --version'),
     installCmd: 'yarn install',
     addDependencyCmd: 'yarn add',
+    runCmd: 'yarn run',
   },
   {
     name: 'pnpm',
     exists: () => commandExists('pnpm --version'),
     installCmd: 'pnpm install',
     addDependencyCmd: 'pnpm add',
+    runCmd: 'pnpm run',
   },
 ]
 
@@ -178,12 +182,21 @@ async function main() {
   logWithPrefix('Copying project files')
   // Base files
   fs.cpSync(path.join(TEMPLATES_DIR, 'base'), params.projectPath, { recursive: true, force: true })
+  // README.md replacements
+  const readmePath = path.join(params.projectPath, 'README.md')
+  let content = fs.readFileSync(readmePath, 'utf-8')
+  content = content.replaceAll('{{PROJECT_NAME}}', params.projectName)
+  content = content.replaceAll('{{PROJECT_PATH}}', params.projectPath)
+  content = content.replaceAll('{{PM_ADD_DEPENDENCY}}', params.packageManager.addDependencyCmd)
+  content = content.replaceAll('{{PM_RUN_SCRIPT}}', params.packageManager.runCmd)
+  fs.writeFileSync(readmePath, content)
+
   // Feature files
   params.features
     .filter((f) => f.directory)
     .forEach((f) => fs.cpSync(f.directory!, params.projectPath, { recursive: true, force: true }))
 
-  // Handle feature runAfter's
+  // Handle feature hooks
   params.features
     .filter((f) => f.hook)
     .forEach((f) => {
