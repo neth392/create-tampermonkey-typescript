@@ -48,8 +48,9 @@ yarn create tampermonkey-typescript
 pnpm create tampermonkey-typescript
 ```
 
-The CLI will walk you through project configuration — name, version, description, author — and let you select optional features (React, Git). The output is your new project folder containing its own `README.md` to get you  started.
-
+The CLI will walk you through the project configuration — name, version, description, author — and let you 
+select optional features (React, Git). The output is your new project folder containing its own `README.md`
+to get you started. You can preview that file here: [Generated Project README](templates/base/README.md)
 ---
 
 ## License
