@@ -42,7 +42,7 @@ export default defineConfig({
     cssCodeSplit: false,
     lib: {
       entry: resolve(__dirname, 'src/script.ts'),
-      name: pkg.name,
+      name: pkg.name.replace(/[^a-zA-Z0-9]/g, '_'),
       formats: ['iife'],
       fileName: () => `script.user.js`,
     },
