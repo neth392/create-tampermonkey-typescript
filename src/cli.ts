@@ -81,7 +81,10 @@ const availableFeatures: Feature[] = [
     name: 'Git',
     description: 'Initializes the new project as a git repository',
     directory: path.join(TEMPLATES_DIR, 'git'),
-    hook: (params) => execInProjectDir(`git init && git add . && git commit -m "Initial commit"`, params),
+    hook: (params) => {
+      fs.renameSync(path.join(params.projectPath, '_gitignore'), path.join(params.projectPath, '.gitignore'))
+      execInProjectDir(`git init && git add . && git commit -m "Initial commit"`, params)
+    },
   },
   {
     name: 'Github Workflows',
