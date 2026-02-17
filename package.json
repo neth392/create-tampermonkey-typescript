@@ -27,6 +27,7 @@
     "dev": "ts-node src/cli.ts"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^24.0.10",
     "@types/prompts": "^2.4.9",
     "@types/react": "^19.1.8",
@@ -35,6 +36,7 @@
     "prettier": "^3.6.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.18",
     "ts-node": "^10.9.2",
     "type-fest": "^5.4.4",
     "typescript": "^5.8.3",

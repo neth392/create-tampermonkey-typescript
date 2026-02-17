@@ -15,6 +15,7 @@ const __dirname = dirname(__filename)
 
 const pkg = JSON.parse(fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'))
 const hasReact = pkg.devDependencies?.react || pkg.dependencies?.react
+const hasTailwind = pkg.devDependencies?.['@tailwindcss/vite'] || pkg.dependencies?.['@tailwindcss/vite']
 
 // Replaced in the script's header to keep package.json as the source of truth.
 const metaTags = {
@@ -37,7 +38,11 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  plugins: [cssInjectedByJsPlugin({ topExecutionPriority: true }), banner({ content: meta, verify: false })],
+  plugins: [
+    ...(hasTailwind ? [(await import('@tailwindcss/vite')).default()] : []),
+    cssInjectedByJsPlugin({ topExecutionPriority: true }),
+    banner({ content: meta, verify: false }),
+  ],
   build: {
     cssCodeSplit: false,
     lib: {

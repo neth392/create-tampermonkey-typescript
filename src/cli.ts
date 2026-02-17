@@ -78,11 +78,26 @@ const availableFeatures: Feature[] = [
     devDependencies: ['react', 'react-dom', '@types/react', '@types/react-dom'],
   },
   {
+    name: 'TailwindCSS',
+    description: 'Adds TailwindCSS support to the project',
+    directory: path.join(TEMPLATES_DIR, 'tailwindcss'),
+    devDependencies: ['tailwindcss', '@tailwindcss/vite'],
+  },
+  {
+    name: 'Prettier',
+    description: 'Adds Prettier with default .prettierrc and .prettierignore files',
+    directory: path.join(TEMPLATES_DIR, 'prettier'),
+    hook: (params) => {
+      renameDotFiles(params, 'prettierrc', 'prettierignore')
+      execInProjectDir('npm install --save-dev --save-exact prettier', params)
+    },
+  },
+  {
     name: 'Git',
     description: 'Initializes the new project as a git repository',
     directory: path.join(TEMPLATES_DIR, 'git'),
     hook: (params) => {
-      fs.renameSync(path.join(params.projectPath, '_gitignore'), path.join(params.projectPath, '.gitignore'))
+      renameDotFiles(params, 'gitignore')
       execInProjectDir(`git init && git add . && git commit -m "Initial commit"`, params)
     },
   },
@@ -337,6 +352,12 @@ function writeObjectToFile(object: Object, fileName: string, params: Params) {
 
 function execInProjectDir(command: string, params: Params) {
   execSync(command, { stdio: 'inherit', cwd: params.projectPath })
+}
+
+function renameDotFiles(params: Params, ...fileNames: string[]) {
+  for (const fileName of fileNames) {
+    fs.renameSync(path.join(params.projectPath, `_${fileName}`), path.join(params.projectPath, `.${fileName}`))
+  }
 }
 
 main().then(
