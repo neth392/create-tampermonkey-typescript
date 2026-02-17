@@ -17,17 +17,24 @@ a single IIFE-format JavaScript file via [Vite](https://vite.dev/), fully compat
 prepended to every build. Metadata fields such as name, version, and description are pulled directly from `package.json`, 
 keeping a single source of truth.
 
+🔧 **Package manager agnostic** — Generated projects are standard Node.js projects. Use npm, yarn, or pnpm —
+whichever you prefer.
+
 🎨 **CSS injection** — Import `.css` files from TypeScript as you normally would. At build time, styles are extracted 
 and bundled into the output script, then injected into the page at runtime — no manual DOM manipulation required.
 
-⚛️ **Optional React support** — Scaffold the project with React pre-configured, including type declarations for 
+### Optional Features
+
+⚛️ **React** — Scaffold the project with React pre-configured, including type declarations for 
 `unsafeWindow.React` and `unsafeWindow.ReactDOM`, and utility functions for accessing them at runtime.
 
-🚀 **GitHub Actions workflows** — Optionally include CI/CD workflows that automatically create Git tags when 
-`package.json` version changes, and publish GitHub Releases with the built script attached.
+🌊 **Tailwind CSS** — Adds Tailwind CSS v4 with the Vite plugin, so utility classes are compiled 
+at build time and only the CSS you actually use is injected into your userscript.
 
-🔧 **Package manager agnostic** — Generated projects are standard Node.js projects. Use npm, yarn, or pnpm — 
-whichever you prefer.
+✨ **Prettier** — Sets up Prettier with a pre-configured `.prettierrc` and `.prettierignore` for consistent formatting.
+
+🚀 **GitHub Actions workflows** — Includes CI/CD workflows that automatically create Git tags when 
+`package.json` version changes, and publish GitHub Releases with the built script attached.
 
 ---
 

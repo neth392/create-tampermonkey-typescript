@@ -11,6 +11,8 @@
 - 📚 [Dependencies](#dependencies)
 - 🐒 [TamperMonkey API](#tampermonkey-api)
 - ⚛️ [React](#react)
+- 🌊 [TailwindCSS](#tailwind-css)
+- ✨ [Prettier](#prettier)
 - ⚙️ [GitHub Workflows](#github-workflows)
 
 
@@ -179,6 +181,43 @@ document.body.appendChild(container)
 const root = ReactDOM.createRoot(container)
 root.render(<App />)
 ```
+
+---
+
+## Tailwind CSS
+
+Tailwind is configured via the `@tailwindcss/vite` plugin and imported in `src/styles.css`. Just use utility classes in your code — only the classes you reference will be included in the final build.
+```ts
+const el = document.createElement('div')
+el.className = 'bg-blue-500 text-white p-4 rounded'
+document.body.appendChild(el)
+```
+
+Or with React:
+```tsx
+const Badge = ({ text, color }: { text: string; color: string }) => (
+  <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold text-white ${color}`}>
+    {text}
+  </span>
+)
+
+const App = () => (
+  <div className="flex gap-2 p-4">
+    <Badge text="Online" color="bg-green-500" />
+    <Badge text="Away" color="bg-yellow-500" />
+    <Badge text="Offline" color="bg-red-500" />
+  </div>
+)
+
+```
+
+For more information, see the [Tailwind CSS docs](https://tailwindcss.com/docs).
+
+---
+
+## Prettier
+
+Prettier is included with a pre-configured `.prettierrc` and `.prettierignore` file. Feel free to change them to best fit your programming style.
 
 ---
 
