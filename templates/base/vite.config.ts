@@ -29,7 +29,7 @@ const metaTags = {
 let meta = fs.readFileSync(resolve(__dirname, 'userscript.txt'), 'utf8')
 
 for (const [tagName, tagValue] of Object.entries(metaTags).filter(([_, v]) => v)) {
-  meta = meta.replace(tagName, tagValue)
+  meta = meta.replaceAll(tagName, tagValue)
 }
 
 export default defineConfig({

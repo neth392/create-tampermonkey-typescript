@@ -3,5 +3,6 @@
 // @version        <version>
 // @description    <description>
 // @author         <author>
+// @namespace      <homepage>
 // @homepage       <homepage>
 // ==/UserScript==
