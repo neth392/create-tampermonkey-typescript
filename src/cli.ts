@@ -53,7 +53,7 @@ const baseTsConfig: TsConfigJson = {
     types: ['vite/client', 'node'],
     target: 'ES2022',
     module: 'ESNext',
-    moduleResolution: 'NodeNext',
+    moduleResolution: 'bundler',
     strict: true,
     esModuleInterop: true,
     forceConsistentCasingInFileNames: true,
