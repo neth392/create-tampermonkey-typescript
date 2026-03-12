@@ -74,7 +74,7 @@ const availableFeatures: Feature[] = [
     name: 'React',
     description: 'Adds react support to the project',
     directory: path.join(TEMPLATES_DIR, 'react'),
-    tsConfigModifier: (config) => (config.compilerOptions!.jsx = 'react-jsx'),
+    tsConfigModifier: (config) => (config.compilerOptions!.jsx = 'react'),
     devDependencies: ['react', 'react-dom', '@types/react', '@types/react-dom'],
   },
   {
