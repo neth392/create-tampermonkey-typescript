@@ -211,7 +211,21 @@ const App = () => (
 
 ```
 
-For more information, see the [Tailwind CSS docs](https://tailwindcss.com/docs).
+### IMPORTANT
+There is a chance that simply using `@import "tailwindcss";` in your styles will break the page's native styling.
+In order to prevent this and utilize tailwind's utilities in your script's own UI, you can scope tailwind to your
+root container like so in `styles.css` (only applicable in v4).
+
+```css
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+
+#your-root-id {
+  @tailwind utilities;
+}
+```
+
+For more information on Tailwind, see the [Tailwind CSS docs](https://tailwindcss.com/docs).
 
 ---
 
