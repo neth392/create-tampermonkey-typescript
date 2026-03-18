@@ -50,7 +50,7 @@ const defaultDeps: string[] = []
 
 const baseTsConfig: TsConfigJson = {
   compilerOptions: {
-    types: ['vite/client', 'node'],
+    types: ['vite/client', 'node', 'tampermonkey'],
     target: 'ES2022',
     module: 'ESNext',
     moduleResolution: 'bundler',
