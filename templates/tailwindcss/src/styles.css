@@ -1,2 +1,15 @@
-/* Add all styles here, keep tailwindcss import for using tailwind */
+/* Add all styles in this file, or create multiple files and be sure to import them all in your script. */
 @import 'tailwindcss';
+
+
+/* (For Tailwind v4) If just using tailwind utilities, it is recommended to replace the above with this. */
+/* It will prevent tailwind's preflight from breaking the css of the page outside of your script's scope. */
+/* Simply delete the above, uncomment below, and replace #your-root-element-id with your own. */
+
+/*@layer theme, base, components, utilities;*/
+/*@import "tailwindcss/theme.css" layer(theme);*/
+/*@custom-variant dark (&:is(.dark-mode *));*/
+
+/*#your-root-element-id {*/
+/*  @tailwind utilities;*/
+/*}*/

@@ -39,9 +39,22 @@ export default defineConfig({
     },
   },
   plugins: [
-    ...(hasTailwind ? [(await import('@tailwindcss/vite')).default()] : []),
+    ...(hasTailwind
+      ? [
+          (await import('@tailwindcss/vite')).default({
+            optimize: { minify: true },
+          }),
+        ]
+      : []),
     cssInjectedByJsPlugin({ topExecutionPriority: true }),
     banner({ content: meta, verify: false }),
+    // Uncomment below to remove comments & JSDoc from the final script.
+    // {
+    //   name: 'strip-comments',
+    //   renderChunk(code) {
+    //     return code.replace(/\/\*\*[\s\S]*?\*\//g, '').replace(/\/\*[^!][\s\S]*?\*\//g, '')
+    //   },
+    // },
   ],
   build: {
     cssCodeSplit: false,

@@ -86,6 +86,10 @@ You should customize this file to include directives specific to your script, su
 - All imported CSS is combined and injected as an inline `<style>` element at runtime
 - The userscript header from `userscript.txt` is prepended
 
+### Removing JSDoc/Comments in Final Script
+The `vite.config.ts` file has a section that can be uncommented which will remove JSDoc and comments from the final
+script, reducing the output file size.
+
 ---
 
 ## CSS
@@ -232,6 +236,10 @@ For more information on Tailwind, see the [Tailwind CSS docs](https://tailwindcs
 ## Prettier
 
 Prettier is included with a pre-configured `.prettierrc` and `.prettierignore` file. Feel free to change them to best fit your programming style.
+
+### Prettier & Tailwind
+Optionally enabled are the `prettier-plugin-tailwindcss` and `prettier-plugin-classnames` plugins to assist in
+formatting when using class names. `prettier-plugin-merge` is used to fix incompatibility between the two.
 
 ---
 

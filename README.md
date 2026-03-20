@@ -32,6 +32,8 @@ and bundled into the output script, then injected into the page at runtime — n
 at build time and only the CSS you actually use is injected into your userscript.
 
 ✨ **Prettier** — Sets up Prettier with a pre-configured `.prettierrc` and `.prettierignore` for consistent formatting.
+If Tailwind is enabled, there is also a prompt to enable the `prettier-plugin-classnames` and `prettier-plugin-tailwindcss`
+plugins which organize class names and automatically wraps the `className` string if it exceeds print width.
 
 🚀 **GitHub Actions workflows** — Includes CI/CD workflows that automatically create Git tags when 
 `package.json` version changes, and publish GitHub Releases with the built script attached.

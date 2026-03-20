@@ -69,6 +69,17 @@ const baseTsConfig: TsConfigJson = {
   include: ['src'],
 }
 
+const basePrettierRc = {
+  trailingComma: 'es5',
+  tabWidth: 2,
+  semi: false,
+  singleQuote: true,
+  printWidth: 120,
+  plugins: [],
+}
+
+const prettierTailwindPlugins = ['prettier-plugin-tailwindcss', 'prettier-plugin-classnames', 'prettier-plugin-merge']
+
 const availableFeatures: Feature[] = [
   {
     name: 'React',
@@ -87,9 +98,17 @@ const availableFeatures: Feature[] = [
     name: 'Prettier',
     description: 'Adds Prettier with default .prettierrc and .prettierignore files',
     directory: path.join(TEMPLATES_DIR, 'prettier'),
+    devDependencies: ['prettier'],
     hook: (params) => {
-      renameDotFiles(params, 'prettierrc', 'prettierignore')
-      execInProjectDir('npm install --save-dev --save-exact prettier', params)
+      if (params.prettierTailwindPlugins) {
+        installDependencies(params, prettierTailwindPlugins, '-D')
+      }
+      const prettierRc = {
+        ...basePrettierRc,
+        ...(params.prettierTailwindPlugins ? { plugins: prettierTailwindPlugins } : {}),
+      }
+      writeObjectToJsonFile(prettierRc, '.prettierrc', params)
+      renameDotFiles(params, 'prettierignore')
     },
   },
   {
@@ -162,7 +181,7 @@ async function main() {
   // Initialize package.json
   logWithPrefix(`Creating ${kleur.yellow('package.json')}`)
   const packageJson = createPackageJson(params)
-  writeObjectToFile(packageJson, 'package.json', params)
+  writeObjectToJsonFile(packageJson, 'package.json', params)
 
   // Initialize the lock file
   logWithPrefix(`Initializing lock file`)
@@ -176,14 +195,14 @@ async function main() {
   if (devDeps.length > 0) {
     logWithPrefix('Installing dev dependencies')
     console.log(`    ${kleur.dim(devDeps.join(', '))}`)
-    execInProjectDir(`${params.packageManager.addDependencyCmd} -D ${devDeps.join(' ')}`, params)
+    installDependencies(params, devDeps, '-D')
   }
 
   // Install dependencies
   if (deps.length > 0) {
     logWithPrefix('Installing dependencies')
     console.log(`    ${kleur.dim(deps.join(', '))}`)
-    execInProjectDir(`${params.packageManager.addDependencyCmd}  ${deps.join(' ')}`, params)
+    installDependencies(params, deps, '-D')
   }
 
   // Handle tsconfig.json
@@ -194,7 +213,7 @@ async function main() {
     }
   }
   logWithPrefix(`Creating ${kleur.yellow('tsconfig.json')}`)
-  writeObjectToFile(tsConfig, 'tsconfig.json', params)
+  writeObjectToJsonFile(tsConfig, 'tsconfig.json', params)
 
   // Copy files
   logWithPrefix('Copying project files')
@@ -311,6 +330,12 @@ async function promptForParams() {
         message: 'Select features:',
         choices: availableFeatures.map((f) => ({ title: f.name, value: f.name, description: f.description })),
       },
+      {
+        type: (prev) => (prev.includes('Prettier') && prev.includes('TailwindCSS') ? 'confirm' : null),
+        name: 'prettierTailwindPlugins',
+        message:
+          'Install prettier-plugin-tailwindcss (auto-sorts classes) and prettier-plugin-classnames (wraps long class strings)?',
+      },
     ],
     {
       onCancel: () => process.exit(0),
@@ -344,7 +369,7 @@ function createPackageJson(params: Params): PackageJson {
   }
 }
 
-function writeObjectToFile(object: Object, fileName: string, params: Params) {
+function writeObjectToJsonFile(object: Object, fileName: string, params: Params) {
   const filePath = path.join(params.projectPath, fileName)
   const jsonString = JSON.stringify(object, null, 2)
   fs.writeFileSync(filePath, jsonString)
@@ -352,6 +377,10 @@ function writeObjectToFile(object: Object, fileName: string, params: Params) {
 
 function execInProjectDir(command: string, params: Params) {
   execSync(command, { stdio: 'inherit', cwd: params.projectPath })
+}
+
+function installDependencies(params: Params, dependencies: string[], flags: string = '') {
+  execInProjectDir(`${params.packageManager.addDependencyCmd} ${flags} ${dependencies.join(' ')}`, params)
 }
 
 function renameDotFiles(params: Params, ...fileNames: string[]) {
