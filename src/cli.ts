@@ -9,13 +9,13 @@ import kleur from 'kleur'
 import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'url'
 
-type Params = Awaited<ReturnType<typeof promptForParams>> & {
+export type Params = Awaited<ReturnType<typeof promptForParams>> & {
   projectPath: string
   features: Feature[]
   packageManager: PackageManager
 }
 
-type Feature = {
+export type Feature = {
   name: string
   description: string
   directory?: string
@@ -25,7 +25,7 @@ type Feature = {
   hook?: (params: Params) => void
 }
 
-type PackageManager = {
+export type PackageManager = {
   name: string
   exists: () => boolean
   installCmd: string
@@ -33,11 +33,11 @@ type PackageManager = {
   runCmd: string
 }
 
-const __FILENAME = fileURLToPath(import.meta.url)
-const __DIRNAME = path.dirname(__FILENAME)
-const TEMPLATES_DIR = path.join(__DIRNAME, '../templates')
+export const __FILENAME = fileURLToPath(import.meta.url)
+export const __DIRNAME = path.dirname(__FILENAME)
+export const TEMPLATES_DIR = path.join(__DIRNAME, '../templates')
 
-const defaultDevDeps: string[] = [
+export const defaultDevDeps: string[] = [
   'typescript', //
   'vite',
   'vite-plugin-banner',
@@ -46,9 +46,9 @@ const defaultDevDeps: string[] = [
   '@types/tampermonkey',
 ]
 
-const defaultDeps: string[] = []
+export const defaultDeps: string[] = []
 
-const baseTsConfig: TsConfigJson = {
+export const baseTsConfig: TsConfigJson = {
   compilerOptions: {
     types: ['vite/client', 'node', 'tampermonkey'],
     target: 'ES2022',
@@ -69,7 +69,7 @@ const baseTsConfig: TsConfigJson = {
   include: ['src'],
 }
 
-const basePrettierRc = {
+export const basePrettierRc = {
   trailingComma: 'es5',
   tabWidth: 2,
   semi: false,
@@ -78,9 +78,13 @@ const basePrettierRc = {
   plugins: [],
 }
 
-const prettierTailwindPlugins = ['prettier-plugin-tailwindcss', 'prettier-plugin-classnames', 'prettier-plugin-merge']
+export const prettierTailwindPlugins = [
+  'prettier-plugin-tailwindcss',
+  'prettier-plugin-classnames',
+  'prettier-plugin-merge',
+]
 
-const availableFeatures: Feature[] = [
+export const availableFeatures: Feature[] = [
   {
     name: 'React',
     description: 'Adds react support to the project',
@@ -128,7 +132,7 @@ const availableFeatures: Feature[] = [
   },
 ]
 
-const availablePackageManagers: PackageManager[] = [
+export const availablePackageManagers: PackageManager[] = [
   {
     name: 'npm',
     exists: () => commandExists('npm --version'),
@@ -248,7 +252,7 @@ function logWithPrefix(message: string) {
   console.log(`${kleur.cyan('-')} ${kleur.white(message)}`)
 }
 
-function commandExists(cmd: string): boolean {
+export function commandExists(cmd: string): boolean {
   try {
     execSync(cmd, { stdio: 'ignore' })
     return true
@@ -257,7 +261,7 @@ function commandExists(cmd: string): boolean {
   }
 }
 
-function checkCwdAccess() {
+export function checkCwdAccess() {
   try {
     fs.accessSync(process.cwd(), fs.constants.W_OK | fs.constants.R_OK)
   } catch {
@@ -267,7 +271,7 @@ function checkCwdAccess() {
   return true
 }
 
-function findValidPackageManager() {
+export function findValidPackageManager() {
   if (!availablePackageManagers.find((pm) => pm.exists())) {
     console.log(kleur.red('Could not find any valid package manager: '))
     console.log(kleur.yellow(`(${availablePackageManagers.map((pm) => pm.name).join(', ')})`))
@@ -276,7 +280,7 @@ function findValidPackageManager() {
   return true
 }
 
-function validateProjectName(projectName: string) {
+export function validateProjectName(projectName: string) {
   if (!projectName || projectName.length === 0) return 'Project name cannot be empty'
   if (projectName.includes(' ')) return 'Project name cannot contain spaces'
 
@@ -343,7 +347,7 @@ async function promptForParams() {
   )
 }
 
-async function createProjectDirectory(path: string) {
+export async function createProjectDirectory(path: string) {
   try {
     fs.mkdirSync(path, { recursive: true })
     return true
@@ -355,7 +359,7 @@ async function createProjectDirectory(path: string) {
   }
 }
 
-function createPackageJson(params: Params): PackageJson {
+export function createPackageJson(params: Params): PackageJson {
   return {
     name: params.projectName,
     description: params.description,
@@ -369,7 +373,7 @@ function createPackageJson(params: Params): PackageJson {
   }
 }
 
-function writeObjectToJsonFile(object: Object, fileName: string, params: Params) {
+export function writeObjectToJsonFile(object: Object, fileName: string, params: Params) {
   const filePath = path.join(params.projectPath, fileName)
   const jsonString = JSON.stringify(object, null, 2)
   fs.writeFileSync(filePath, jsonString)
@@ -383,13 +387,16 @@ function installDependencies(params: Params, dependencies: string[], flags: stri
   execInProjectDir(`${params.packageManager.addDependencyCmd} ${flags} ${dependencies.join(' ')}`, params)
 }
 
-function renameDotFiles(params: Params, ...fileNames: string[]) {
+export function renameDotFiles(params: Params, ...fileNames: string[]) {
   for (const fileName of fileNames) {
     fs.renameSync(path.join(params.projectPath, `_${fileName}`), path.join(params.projectPath, `.${fileName}`))
   }
 }
 
-main().then(
-  () => {},
-  (e) => console.error(kleur.red(e.message || e))
-)
+const isDirectRun = process.argv[1]?.endsWith('cli.ts') || process.argv[1]?.endsWith('cli.js')
+if (isDirectRun) {
+  main().then(
+    () => {},
+    (e) => console.error(kleur.red(e.message || e))
+  )
+}
