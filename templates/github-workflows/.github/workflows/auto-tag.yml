@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required to push tags
+          fetch-depth: 0 # Required to push tags
 
       - name: Setup Node
         uses: actions/setup-node@v4

@@ -15,7 +15,6 @@
 - ✨ [Prettier](#prettier)
 - ⚙️ [GitHub Workflows](#github-workflows)
 
-
 ## Quick Start
 
 ```bash
@@ -87,6 +86,7 @@ You should customize this file to include directives specific to your script, su
 - The userscript header from `userscript.txt` is prepended
 
 ### Removing JSDoc/Comments in Final Script
+
 The `vite.config.ts` file has a section that can be uncommented which will remove JSDoc and comments from the final
 script, reducing the output file size.
 
@@ -108,7 +108,7 @@ import './MyComponent.css'
 The `@/` path alias points to `src/`, giving you cleaner imports:
 
 ```typescript
-import { helper } from '@/utils/helper'  // → src/utils/helper.ts
+import { helper } from '@/utils/helper' // → src/utils/helper.ts
 ```
 
 ---
@@ -191,6 +191,7 @@ root.render(<App />)
 ## Tailwind CSS
 
 Tailwind is configured via the `@tailwindcss/vite` plugin and imported in `src/styles.css`. Just use utility classes in your code — only the classes you reference will be included in the final build.
+
 ```ts
 const el = document.createElement('div')
 el.className = 'bg-blue-500 text-white p-4 rounded'
@@ -198,11 +199,10 @@ document.body.appendChild(el)
 ```
 
 Or with React:
+
 ```tsx
 const Badge = ({ text, color }: { text: string; color: string }) => (
-  <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold text-white ${color}`}>
-    {text}
-  </span>
+  <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold text-white ${color}`}>{text}</span>
 )
 
 const App = () => (
@@ -212,17 +212,17 @@ const App = () => (
     <Badge text="Offline" color="bg-red-500" />
   </div>
 )
-
 ```
 
 ### IMPORTANT
+
 There is a chance that simply using `@import "tailwindcss";` in your styles will break the page's native styling.
 In order to prevent this and utilize tailwind's utilities in your script's own UI, you can scope tailwind to your
 root container like so in `styles.css` (only applicable in v4).
 
 ```css
 @layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
+@import 'tailwindcss/theme.css' layer(theme);
 
 #your-root-id {
   @tailwind utilities;
@@ -238,6 +238,7 @@ For more information on Tailwind, see the [Tailwind CSS docs](https://tailwindcs
 Prettier is included with a pre-configured `.prettierrc` and `.prettierignore` file. Feel free to change them to best fit your programming style.
 
 ### Prettier & Tailwind
+
 Optionally enabled are the `prettier-plugin-tailwindcss` and `prettier-plugin-classnames` plugins to assist in
 formatting when using class names. `prettier-plugin-merge` is used to fix incompatibility between the two.
 
@@ -270,5 +271,3 @@ Users can install directly from your releases by adding these tags to `userscrip
 // @updateURL      https://github.com/user/repo/releases/latest/download/script.user.js
 // @downloadURL    https://github.com/user/repo/releases/latest/download/script.user.js
 ```
-
-
