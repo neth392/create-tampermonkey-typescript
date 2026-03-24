@@ -300,13 +300,14 @@ describe('defaultDevDeps', () => {
     expect(defaultDevDeps).toContain('typescript')
     expect(defaultDevDeps).toContain('vite')
     expect(defaultDevDeps).toContain('vite-plugin-banner')
+    expect(defaultDevDeps).toContain('vite-plugin-checker')
     expect(defaultDevDeps).toContain('vite-plugin-css-injected-by-js')
     expect(defaultDevDeps).toContain('ts-node')
     expect(defaultDevDeps).toContain('@types/tampermonkey')
   })
 
-  it('has exactly 6 entries', () => {
-    expect(defaultDevDeps).toHaveLength(6)
+  it('has exactly 7 entries', () => {
+    expect(defaultDevDeps).toHaveLength(7)
   })
 })
 

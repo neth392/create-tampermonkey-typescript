@@ -40,6 +40,7 @@ export const TEMPLATES_DIR = path.join(__DIRNAME, '../templates')
 export const defaultDevDeps: string[] = [
   'typescript', //
   'vite',
+  'vite-plugin-checker',
   'vite-plugin-banner',
   'vite-plugin-css-injected-by-js',
   'ts-node',

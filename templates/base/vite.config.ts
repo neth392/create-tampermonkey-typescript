@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url'
 import fs from 'fs'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import banner from 'vite-plugin-banner'
+import checker from 'vite-plugin-checker'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -39,6 +40,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    checker({ typescript: true }),
     ...(hasTailwind
       ? [
           (await import('@tailwindcss/vite')).default({
