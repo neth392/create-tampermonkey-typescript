@@ -1,6 +1,6 @@
 {
   "name": "create-tampermonkey-typescript",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "CLI tool for generating a TamperMonkey script project written in typescript which is transpiled to JavaScript to be ran in the browser",
   "license": "MIT",
   "homepage": "https://github.com/neth392/create-tampermonkey-typescript",
