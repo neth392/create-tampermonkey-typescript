@@ -36,7 +36,8 @@ If Tailwind is enabled, there is also a prompt to enable the `prettier-plugin-cl
 plugins which organize class names and automatically wraps the `className` string if it exceeds print width.
 
 🚀 **GitHub Actions workflows** — Includes CI/CD workflows that automatically create Git tags when
-`package.json` version changes, and publish GitHub Releases with the built script attached.
+`package.json` version changes, and publish GitHub Releases with the built script attached. Supports both
+stable releases from `master` and rolling beta/pre-release builds from `dev`.
 
 ---
 

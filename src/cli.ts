@@ -376,6 +376,7 @@ export function createPackageJson(
     description: params.description,
     version: params.version,
     author: params.author,
+    homepage: 'replace with homepage URL',
     scriptDownloadUrl: 'replace with download URL',
     betaDownloadUrl: 'replace with download URL for beta builds',
     main: 'dist/script.user.js',

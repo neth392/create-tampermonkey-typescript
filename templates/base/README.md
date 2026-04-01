@@ -61,19 +61,29 @@ src/
 
 ## Userscript Header
 
-The file `userscript.txt` defines your script's TamperMonkey metadata. It is automatically prepended to the built script, with placeholders replaced from `package.json` to maintain a single source of truth:
-
+The file `userscript.txt` defines your script's TamperMonkey metadata. It is automatically prepended to the built script, 
+with placeholders replaced from `package.json` to maintain a single source of truth:
 ```
 // ==UserScript==
-// @name           <name>           ← package.json "name"
+// @name           <n>              ← package.json "name" (appends "-beta" when IS_BETA=true)
 // @version        <version>        ← package.json "version"
 // @description    <description>    ← package.json "description"
 // @author         <author>         ← package.json "author"
 // @homepage       <homepage>       ← package.json "homepage"
+// @updateURL      <downloadURL>    ← package.json "scriptDownloadUrl" (or "betaDownloadUrl" when IS_BETA=true)
+// @downloadURL    <downloadURL>    ← package.json "scriptDownloadUrl" (or "betaDownloadUrl" when IS_BETA=true)
 // ==/UserScript==
 ```
 
-You should customize this file to include directives specific to your script, such as `@match`, `@grant`, `@require`, and so on. See the [TamperMonkey documentation](https://www.tampermonkey.net/documentation.php) for the full list of supported tags.
+The `scriptDownloadUrl` and `betaDownloadUrl` fields in `package.json` control the download/update URLs injected into 
+the built script. Set these to your GitHub release URLs so TamperMonkey can auto-update:
+
+- **Stable:** `https://github.com/user/repo/releases/latest/download/script.user.js`
+- **Beta:** `https://github.com/user/repo/releases/download/beta/script.user.js`
+
+You should customize `userscript.txt` to include directives specific to your script, such as `@match`, `@grant`, `@require`, 
+and so on. See the [TamperMonkey documentation](https://www.tampermonkey.net/documentation.php) for the full list of 
+supported tags.
 
 ---
 
@@ -84,17 +94,25 @@ You should customize this file to include directives specific to your script, su
 - All TypeScript is compiled to JavaScript
 - All imported CSS is combined and injected as an inline `<style>` element at runtime
 - The userscript header from `userscript.txt` is prepended
+- Line endings are normalized to `\n` (Unix-style) in the output
+
+### Line Ending Normalization
+
+The `vite.config.ts` includes a `normalize-line-endings` plugin that converts Windows-style line endings (`\r\n`) to Unix-style (`\n`) in the built output. Without this, TamperMonkey's script editor may display broken or invisible line breaks. This runs automatically — no action needed.
 
 ### Removing JSDoc/Comments in Final Script
 
 The `vite.config.ts` file has a section that can be uncommented which will remove JSDoc and comments from the final
 script, reducing the output file size.
 
+
+
 ---
 
 ## CSS
 
-Import `.css` files from anywhere in your source. All stylesheets are combined into a single style node and injected into the page at runtime — no manual DOM manipulation needed.
+Import `.css` files from anywhere in your source. All stylesheets are combined into a single style node and injected 
+into the page at runtime — no manual DOM manipulation needed.
 
 ```typescript
 import '@/styles.css'
@@ -115,7 +133,8 @@ import { helper } from '@/utils/helper' // → src/utils/helper.ts
 
 ## Dependencies
 
-Any imported dependency will be included in the bundled script. To keep the output small, the recommended approach is to load libraries via TamperMonkey's [`@require`](https://www.tampermonkey.net/documentation.php?locale=en#meta:require) tag and install them as dev dependencies so they aren't bundled.
+Any imported dependency will be included in the bundled script. To keep the output small, the recommended approach is 
+to load libraries via TamperMonkey's [`@require`](https://www.tampermonkey.net/documentation.php?locale=en#meta:require) tag and install them as dev dependencies so they aren't bundled.
 
 **Example with jQuery:**
 
@@ -169,7 +188,9 @@ Remember to declare each function you use as a grant in `userscript.txt`:
 
 > This section only applies if React was enabled during project creation.
 
-React and ReactDOM are **not bundled** into the output script. They are expected to be available on the host page via `unsafeWindow`. The generated project includes type declarations (`src/global.d.ts`) and helper functions for accessing them at runtime:
+React and ReactDOM are **not bundled** into the output script. They are expected to be available on the host page via 
+`unsafeWindow`. The generated project includes type declarations (`src/global.d.ts`) and helper functions for accessing 
+them at runtime:
 
 ```tsx
 import { getReact, getReactDOM } from '@/util/react-util'
@@ -190,7 +211,8 @@ root.render(<App />)
 
 ## Tailwind CSS
 
-Tailwind is configured via the `@tailwindcss/vite` plugin and imported in `src/styles.css`. Just use utility classes in your code — only the classes you reference will be included in the final build.
+Tailwind is configured via the `@tailwindcss/vite` plugin and imported in `src/styles.css`. Just use utility classes in 
+your code — only the classes you reference will be included in the final build.
 
 ```ts
 const el = document.createElement('div')
@@ -235,7 +257,8 @@ For more information on Tailwind, see the [Tailwind CSS docs](https://tailwindcs
 
 ## Prettier
 
-Prettier is included with a pre-configured `.prettierrc` and `.prettierignore` file. Feel free to change them to best fit your programming style.
+Prettier is included with a pre-configured `.prettierrc` and `.prettierignore` file. Feel free to change them to best 
+fit your programming style.
 
 ### Prettier & Tailwind
 
@@ -248,24 +271,48 @@ formatting when using class names. `prettier-plugin-merge` is used to fix incomp
 
 > This section only applies if Git was enabled during project creation.
 
-Two GitHub Actions workflows are included to automate your release process.
+Two GitHub Actions workflows are included to automate your release process, supporting both stable releases from `master` 
+and beta/pre-release builds from `dev`.
 
 ### Auto-Tagging (`auto-tag.yml`)
 
-Runs on every push to `master`. Reads the version from `package.json` and creates a Git tag (e.g., `v1.2.3`) if one doesn't already exist.
+Runs on every push to `master` or `dev`. On `master`, it reads the version from `package.json` and creates a Git 
+tag (e.g., `v1.2.3`) if one doesn't already exist. On `dev`, it force-updates a rolling `beta` tag to point to the 
+latest commit.
 
 ### Release (`release.yml`)
 
-Triggers when the auto-tag workflow completes successfully. Runs the build, then creates a GitHub Release with `dist/script.user.js` attached.
+Triggers when the auto-tag workflow completes successfully. The workflow detects which branch triggered it and adjusts 
+accordingly:
 
-### Publishing Workflow
+- **`master`** — Builds the script and creates a GitHub Release tagged with the version (e.g., `v1.2.3`), marked as 
+- the latest release.
+- **`dev`** — Builds the script with `IS_BETA=true` and a timestamped version (e.g., `1.0.0-beta.20260401120000`). 
+- The release is tagged `beta`, marked as a pre-release, and is not promoted to "latest". The `IS_BETA` env variable 
+- causes the build to use `betaDownloadUrl` instead of `scriptDownloadUrl` and append `-beta` to the script name.
+
+### Stable Publishing Workflow
 
 1. Update `version` in `package.json`
 2. Commit and push to `master`
-3. The auto-tag workflow creates a new tag
+3. The auto-tag workflow creates a new version tag
 4. The release workflow builds and publishes the script
 
-Users can install directly from your releases by adding these tags to `userscript.txt`:
+### Beta Publishing Workflow
+
+1. Make changes on the `dev` branch
+2. Commit and push to `dev`
+3. The auto-tag workflow force-updates the `beta` tag
+4. The release workflow builds and publishes a pre-release
+
+### Download URLs
+
+Set `scriptDownloadUrl` and `betaDownloadUrl` in `package.json` so TamperMonkey can auto-update your script:
+
+- **Stable:** `https://github.com/user/repo/releases/latest/download/script.user.js`
+- **Beta:** `https://github.com/user/repo/releases/download/beta/script.user.js`
+
+These values are injected into `@updateURL` and `@downloadURL` in the built script header via the `<downloadURL>` placeholder in `userscript.txt`.
 
 ```
 // @updateURL      https://github.com/user/repo/releases/latest/download/script.user.js
