@@ -62,7 +62,7 @@ export const baseTsConfig: TsConfigJson = {
     resolveJsonModule: true,
     outDir: 'dist',
     paths: {
-      '@/*': ['src/*'],
+      '@/*': ['./src/*'],
     },
     lib: ['ES2022', 'dom', 'dom.iterable'],
   },
