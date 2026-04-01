@@ -18,13 +18,16 @@ const pkg = JSON.parse(fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8
 const hasReact = pkg.devDependencies?.react || pkg.dependencies?.react
 const hasTailwind = pkg.devDependencies?.['@tailwindcss/vite'] || pkg.dependencies?.['@tailwindcss/vite']
 
+const isBeta = process.env.IS_BETA === 'true'
+
 // Replaced in the script's header to keep package.json as the source of truth.
 const metaTags = {
-  '<name>': pkg.name,
+  '<name>': isBeta ? `${pkg.name}-beta` : pkg.name,
   '<version>': pkg.version,
   '<description>': pkg.description,
   '<author>': pkg.author,
   '<homepage>': pkg.homepage,
+  '<downloadURL>': isBeta ? pkg.betaDownloadUrl : pkg.scriptDownloadUrl,
 }
 
 let meta = fs.readFileSync(resolve(__dirname, 'userscript.txt'), 'utf8')
@@ -57,6 +60,17 @@ export default defineConfig({
     //     return code.replace(/\/\*\*[\s\S]*?\*\//g, '').replace(/\/\*[^!][\s\S]*?\*\//g, '')
     //   },
     // },
+    //
+    {
+      name: 'normalize-line-endings',
+      writeBundle(options, bundle) {
+        for (const fileName of Object.keys(bundle)) {
+          const filePath = resolve(options.dir!, fileName)
+          const content = fs.readFileSync(filePath, 'utf-8')
+          fs.writeFileSync(filePath, content.replace(/\r\n/g, '\n'), 'utf-8')
+        }
+      },
+    },
   ],
   build: {
     cssCodeSplit: false,

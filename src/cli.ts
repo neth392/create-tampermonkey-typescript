@@ -123,6 +123,10 @@ export const availableFeatures: Feature[] = [
     hook: (params) => {
       renameDotFiles(params, 'gitignore')
       execInProjectDir(`git init && git add . && git commit -m "Initial commit"`, params)
+      execInProjectDir(`git checkout -b dev`, params)
+      if (params.gitRemoteUrl) {
+        execInProjectDir(`git remote add origin ${params.gitRemoteUrl}`, params)
+      }
     },
   },
   {
@@ -341,6 +345,11 @@ async function promptForParams() {
         message:
           'Install prettier-plugin-tailwindcss (auto-sorts classes) and prettier-plugin-classnames (wraps long class strings)?',
       },
+      {
+        type: (_prev, values) => (values.featureNames?.includes('Git') ? 'text' : null),
+        name: 'gitRemoteUrl',
+        message: 'Git remote URL (leave blank to skip):',
+      },
     ],
     {
       onCancel: () => process.exit(0),
@@ -360,12 +369,16 @@ export async function createProjectDirectory(path: string) {
   }
 }
 
-export function createPackageJson(params: Params): PackageJson {
+export function createPackageJson(
+  params: Params
+): PackageJson & { scriptDownloadUrl: string; betaDownloadUrl: string } {
   return {
     name: params.projectName,
     description: params.description,
     version: params.version,
     author: params.author,
+    scriptDownloadUrl: 'replace with download URL',
+    betaDownloadUrl: 'replace with download URL for beta builds',
     main: 'dist/script.user.js',
     type: 'module',
     scripts: {
