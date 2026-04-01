@@ -61,7 +61,6 @@ export const baseTsConfig: TsConfigJson = {
     skipLibCheck: true,
     resolveJsonModule: true,
     outDir: 'dist',
-    baseUrl: '.',
     paths: {
       '@/*': ['src/*'],
     },
